@@ -1,0 +1,49 @@
+{
+  "project_info": {
+    "project_number": "931270087231",
+    "firebase_url": "https://dihaadiainfoxx-default-rtdb.firebaseio.com",
+    "project_id": "dihaadiainfoxx",
+    "storage_bucket": "dihaadiainfoxx.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:931270087231:android:8059f7843907687e0b9e8a",
+        "android_client_info": {
+          "package_name": "com.dihaadi.aiinfox"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCVyVninYNIELHc1P9tb7e-lXJZ41JTyMg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:931270087231:android:560f3df02a003c8b0b9e8a",
+        "android_client_info": {
+          "package_name": "com.dihaadi.aiinfox.service"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCVyVninYNIELHc1P9tb7e-lXJZ41JTyMg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
