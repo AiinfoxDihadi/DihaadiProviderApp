@@ -24,9 +24,12 @@ class SkillsAddController extends GetxController {
     ]),
   ];
   List<String> hoursList = ['Full Time','Part Time'];
-  // String availableHours = <String>.obs;
+  List<String> workLocation = ['House','Office','Girls PG' , "Boys PG"];
 
   List<String> selectedSkills = <String>[].obs;
+
+  var hours = ''.obs;
+  var work = ''.obs;
 
   void toggleSkillSelection(String skillName) {
     if (selectedSkills.contains(skillName)) {
@@ -36,7 +39,9 @@ class SkillsAddController extends GetxController {
     }
   }
  void addHours(String val) {
-    // availableHours = val;
+   hours.value = val;
  }
-
+ void addLocation(String val) {
+    work.value =  val;
+ }
 }

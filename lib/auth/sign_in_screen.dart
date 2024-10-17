@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:handyman_provider_flutter/auth/addSkillsController.dart';
 import 'package:handyman_provider_flutter/auth/forgot_password_dialog.dart';
 import 'package:handyman_provider_flutter/auth/sign_up_screen.dart';
 import 'package:handyman_provider_flutter/components/app_widgets.dart';
@@ -121,20 +122,16 @@ class _SignInScreenState extends State<SignInScreen> {
                                     suffix: authstore.isOTPVisible
                                         ? Padding(
                                       padding: const EdgeInsets.only(top: 16.0),
-                                      child: Observer(
-                                        builder: (BuildContext context) {
-                                          return GestureDetector(
-                                            onTap: () {
-                                              print('helllllllllllllllo');
-                                              authstore.toggleVisibility();
-                                            },
-                                            child: Text(
-                                              'Edit',
-                                              style: primaryTextStyle(
-                                                  color: primaryColor),
-                                            ),
-                                          );
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          print('helllllllllllllllo');
+                                          authstore.toggleVisibility();
                                         },
+                                        child: Text(
+                                          'Edit',
+                                          style: primaryTextStyle(
+                                              color: primaryColor),
+                                        ),
                                       ),
                                     )
                                         : ic_phone.iconImage(size: 5).paddingAll(16),
@@ -169,7 +166,8 @@ class _SignInScreenState extends State<SignInScreen> {
                                           15.height,
                                           Center(
                                             child: OTP.OTPTextField(
-                                              cursorColor: Color(0xffE9ECEF),
+                                              cursorColor: primaryColor,
+                                              textStyle: primaryTextStyle(),
                                               onCompleted: (pin) {
                                                 passwordCont.text = pin;
                                               },
@@ -399,7 +397,7 @@ class _SignInScreenState extends State<SignInScreen> {
   void _handleLoginUsers() async {
     hideKeyboard(context);
     Map<String, dynamic> request = {
-      'email': 'demo@provider.com',
+      'email': "${emailCont.text.trim()}@gmail.com",
       'password': '12345678',
     };
 
@@ -413,9 +411,9 @@ class _SignInScreenState extends State<SignInScreen> {
       }
 
       await setValue(USER_PASSWORD, "12345678");
-      await setValue(IS_REMEMBERED, isRemember);
+      await appStore.setContactNumber(emailCont.text.trim());
       await saveUserData(user);
-      authService.verifyFirebaseUser();
+      await authService.verifyFirebaseUser();
 
       redirectWidget(res: user);
     } catch (e) {

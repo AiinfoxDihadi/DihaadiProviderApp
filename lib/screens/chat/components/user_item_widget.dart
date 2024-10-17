@@ -39,7 +39,7 @@ class _UserItemWidgetState extends State<UserItemWidget> {
                       width: 40,
                       padding: EdgeInsets.all(10),
                       color: context.primaryColor.withOpacity(0.2),
-                      child: Text(data.displayName.validate()[0].validate().toUpperCase(), style: boldTextStyle(color: context.primaryColor)).center().fit(),
+                      child: Text(data.displayName.validate().toUpperCase(), style: boldTextStyle(color: context.primaryColor)).center().fit(),
                     ).cornerRadiusWithClipRRect(50)
                   else
                     CachedImageWidget(url: data.profileImage.validate(), height: 40, circle: true, fit: BoxFit.cover),

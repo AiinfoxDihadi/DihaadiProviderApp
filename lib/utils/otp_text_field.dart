@@ -120,7 +120,7 @@ class OTPTextFieldState extends State<OTPTextField> {
           decoration: widget.boxDecoration ??
               BoxDecoration(
                 border: Border.all(
-                  color: Color(0xFFE9ECEF),
+                  color: context.dividerColor,
                   width: list[index].focusNode!.hasFocus ? 2 : 1,
                 ),
                 borderRadius: radius(8),

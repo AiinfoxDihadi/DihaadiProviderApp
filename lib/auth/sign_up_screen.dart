@@ -130,8 +130,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
         Container(
           width: 85,
           height: 85,
-          decoration: boxDecorationWithRoundedCorners(boxShape: BoxShape.circle, backgroundColor: primaryColor),
-          child: Image.asset(appLogo, height: 50, width: 50),
+          decoration: boxDecorationWithRoundedCorners(boxShape: BoxShape.rectangle,
+              backgroundColor: primaryColor,
+              decorationImage: DecorationImage(image: AssetImage(appLogo))),
         ),
         16.height,
         Text(languages.lblSignupTitle, style: boldTextStyle(size: 18)),
@@ -176,6 +177,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           isValidationRequired: true,
           focus: designationFocus,
           nextFocus: passwordFocus,
+          errorThisFieldRequired: languages.hintRequired,
           decoration: inputDecoration(context, hint: languages.gender),
           suffix: profile.iconImage(size: 10).paddingAll(14),
         ),
@@ -183,9 +185,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
         AppTextField(
           textFieldType: TextFieldType.USERNAME,
           controller: ageCont,
-          isValidationRequired: false,
+          isValidationRequired: true,
           focus: passwordFocus,
           nextFocus: lNameFocus,
+          errorThisFieldRequired: languages.hintRequired,
           decoration: inputDecoration(context, hint: languages.age),
           suffix: profile.iconImage(size: 10).paddingAll(14),
         ),
@@ -266,11 +269,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
         AppTextField(
           textFieldType: TextFieldType.USERNAME,
           controller: addressCont,
-          isValidationRequired: false,
+          isValidationRequired: true,
           focus: lNameFocus,
           nextFocus: lNameFocus,
+          errorThisFieldRequired: languages.hintRequired,
           decoration: inputDecoration(context, hint: languages.address),
-          suffix: profile.iconImage(size: 10).paddingAll(14),
+          suffix: ic_location.iconImage(size: 10).paddingAll(14),
         ),
         20.height,
         // _buildTcAcceptWidget(),
@@ -283,7 +287,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
           textStyle: boldTextStyle(color: white),
           width: context.width() - context.navigationBarHeight,
           onTap: () {
-            SignInWorkExperience().launch(context);
+            if(formKey.currentState!.validate()) {
+              appStore.setContactNumber(mobileCont.text.trim());
+              appStore.setFirstName(fNameCont.text.trim());
+              SignInWorkExperience().launch(context);
+            }
+
           },
         ),
       ],

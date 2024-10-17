@@ -14,16 +14,16 @@ class AuthService {
     UserCredential? userCredential;
     try {
       /// login with Firebase
-      userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(email: 'robertmartin@gmail.com', password: '12345678');
+      userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(email: appStore.userEmail, password: '12345678');
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
         /// register user in Firebase
-        userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(email: "robertmartin@gmail.com", password: '12345678');
+        userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(email: appStore.userEmail, password: '12345678');
         print("================> code${e.code}");
       }
     }
     if (userCredential != null && userCredential.user == null) {
-      userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(email: "robertmartin@gmail.com", password: '12345678');
+      userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(email: appStore.userEmail, password: '12345678');
     }
 
     if (userCredential != null) {
