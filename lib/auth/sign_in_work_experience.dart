@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -10,6 +11,7 @@ import 'package:handyman_provider_flutter/main.dart';
 import 'package:handyman_provider_flutter/utils/colors.dart';
 import 'package:handyman_provider_flutter/utils/common.dart';
 import 'package:handyman_provider_flutter/utils/configs.dart';
+import 'package:handyman_provider_flutter/utils/validators.dart';
 import 'package:nb_utils/nb_utils.dart';
 
 class SignInWorkExperience extends StatefulWidget {
@@ -29,6 +31,14 @@ class _SignInWorkExperienceState extends State<SignInWorkExperience> {
   TextEditingController emergencyCont = TextEditingController();
   TextEditingController emergencyPerson = TextEditingController();
   TextEditingController healthIssue = TextEditingController();
+
+  @override
+  void dispose() {
+    Get.delete<SkillsAddController>();
+    super.dispose();
+  }
+
+  bool isSwitched = false;
 
   @override
   Widget build(BuildContext context) {
@@ -54,8 +64,9 @@ class _SignInWorkExperienceState extends State<SignInWorkExperience> {
                   children: [
                     10.height,
                     AppTextField(
-                      textFieldType: TextFieldType.NAME,
+                      textFieldType: TextFieldType.PHONE,
                       controller: workExpCont,
+                      validator: Validator.totalExperience,
                       isValidationRequired: true,
                       errorThisFieldRequired: languages.hintRequired,
                       decoration: inputDecoration(context, hint: languages.workExperience),
@@ -144,7 +155,7 @@ class _SignInWorkExperienceState extends State<SignInWorkExperience> {
                             Obx(() {
                               return Text(maxLines: 2,
                                 skillsAddController.selectedSkills.isNotEmpty ? skillsAddController.selectedSkills.join(', ') : languages.skillsAndSpecialization,
-                                style: secondaryTextStyle(),
+                                style: skillsAddController.selectedSkills.isNotEmpty ? primaryTextStyle() : secondaryTextStyle(),
                               ).flexible();
                             }),
                             Icon(Icons.arrow_drop_down, color: textSecondaryColorGlobal),
@@ -207,7 +218,7 @@ class _SignInWorkExperienceState extends State<SignInWorkExperience> {
                             Obx(() {
                               return Text(maxLines: 2,
                                 skillsAddController.hours.value.isNotEmpty ? skillsAddController.hours.value : languages.availableHours,
-                                style: secondaryTextStyle(),
+                                style: skillsAddController.hours.value.isNotEmpty ? primaryTextStyle() : secondaryTextStyle(),
                               ).flexible();
                             }),
                             Icon(Icons.arrow_drop_down, color: textSecondaryColorGlobal),
@@ -216,12 +227,90 @@ class _SignInWorkExperienceState extends State<SignInWorkExperience> {
                       ),
                     ),
                     18.height,
-                    AppTextField(
-                      textFieldType: TextFieldType.NAME,
-                      controller: availableDaysCont,
-                      isValidationRequired: true,
-                      errorThisFieldRequired: languages.hintRequired,
-                      decoration: inputDecoration(context, hint: languages.availableDays),
+                    GestureDetector(
+                      onTap: () {
+                        showModalBottomSheet(
+                          backgroundColor: context.scaffoldBackgroundColor,
+                          context: context,
+                          useSafeArea: true,
+                          isScrollControlled: true,
+                          isDismissible: true,
+                          builder: (_) {
+                            return Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                20.height,
+                                Container(
+                                  width: MediaQuery.of(context).size.width,
+                                  padding: EdgeInsets.all(16.0),
+                                  child: Wrap(
+                                    spacing: 8.0,
+                                    runSpacing: 8.0,
+                                    children: List.generate(
+                                      skillsAddController.availableDaysList.length,
+                                          (index) {
+                                        String day = skillsAddController.availableDaysList[index];
+                                        return Obx(() {
+                                          bool isSelected = skillsAddController.availableDays.contains(day);
+                                          return GestureDetector(
+                                            onTap: () {
+                                              skillsAddController.addDays(day);
+                                              hideKeyboard(context);
+                                            },
+                                            child: Container(
+                                              padding: EdgeInsets.all(10),
+                                              decoration: BoxDecoration(
+                                                color: isSelected ? primaryColor : Colors.transparent,
+                                                borderRadius: BorderRadius.circular(50),
+                                                border: Border.all(color: primaryColor),
+                                              ),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Text(
+                                                    day,
+                                                    style: secondaryTextStyle(color: isSelected ? Colors.white : textSecondaryColorGlobal),
+                                                  ),
+                                                  if (isSelected) Icon(Icons.check, color: Colors.white, size: 15),
+                                                ],
+                                              ),
+                                            ),
+                                          );
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                ),
+                                30.height
+
+                              ],
+                            );
+                          },
+                        );
+                      },
+                      child: Container(
+                        height: 50,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: cardColor,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Obx(() {
+                              return Text(
+                                skillsAddController.availableDays.isNotEmpty
+                                    ? skillsAddController.availableDays.join(', ')
+                                    : languages.availableDays,
+                                style: skillsAddController.availableDays.isNotEmpty
+                                    ? primaryTextStyle() : secondaryTextStyle(),
+                              ).flexible();
+                            }),
+                            Icon(Icons.arrow_drop_down, color: textSecondaryColorGlobal),
+                          ],
+                        ).paddingOnly(left: 10, right: 10),
+                      ),
                     ),
                     18.height,
                     GestureDetector(
@@ -278,7 +367,7 @@ class _SignInWorkExperienceState extends State<SignInWorkExperience> {
                             Obx(() {
                               return Text(maxLines: 2,
                                 skillsAddController.work.value.isNotEmpty ? skillsAddController.work.value : languages.preferredWorkLocation,
-                                style: secondaryTextStyle(),
+                                style: skillsAddController.work.value.isNotEmpty ? primaryTextStyle():secondaryTextStyle(),
                               ).flexible();
                             }),
                             Icon(Icons.arrow_drop_down, color: textSecondaryColorGlobal),
@@ -295,17 +384,38 @@ class _SignInWorkExperienceState extends State<SignInWorkExperience> {
                       decoration: inputDecoration(context, hint: languages.preferredWorkType),
                     ),
                     18.height,
-                    AppTextField(
-                      textFieldType: TextFieldType.NAME,
-                      controller: statusCont,
-                      isValidationRequired: true,
-                      errorThisFieldRequired: languages.hintRequired,
-                      decoration: inputDecoration(context, hint: languages.availabiltyStatus),
+                    Container(
+                      height: 50,
+                      padding: EdgeInsets.symmetric(horizontal: 12),
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: cardColor,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(languages.availabiltyStatus,style: secondaryTextStyle()),
+                          Transform.scale(
+                            scale: 0.75,
+                            child: CupertinoSwitch(
+                              activeColor: primaryColor,
+                              value: isSwitched,
+                              onChanged: (bool value) {
+                                setState(() {
+                                  isSwitched = value;
+                                });
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                     18.height,
                     AppTextField(
-                      textFieldType: TextFieldType.NAME,
+                      textFieldType: TextFieldType.PHONE,
                       controller: emergencyCont,
+                      validator: Validator.phoneNumberValidate,
                       isValidationRequired: true,
                       errorThisFieldRequired: languages.hintRequired,
                       decoration: inputDecoration(context, hint: languages.emergencyContactNo),
@@ -335,7 +445,12 @@ class _SignInWorkExperienceState extends State<SignInWorkExperience> {
                       width: MediaQuery.sizeOf(context).width - context.navigationBarHeight,
                       onTap: () {
                         if(formKey.currentState!.validate()) {
-                          LegalVerificationScreen().launch(context);
+                          if(skillsAddController.selectedSkills.isNotEmpty && skillsAddController.availableDays.isNotEmpty && skillsAddController.hours.value.isNotEmpty &&
+                          skillsAddController.work.value.isNotEmpty ) {
+                            LegalVerificationScreen().launch(context);
+                          } else {
+                            toast('please fill details');
+                          }
 
                         }
                       },

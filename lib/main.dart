@@ -152,7 +152,6 @@ class _MyAppState extends State<MyApp> {
     return RestartAppWidget(
       child: Observer(
         builder: (_) => MaterialApp(
-         
           debugShowCheckedModeBanner: false,
           navigatorKey: navigatorKey,
           home: SplashScreen(),

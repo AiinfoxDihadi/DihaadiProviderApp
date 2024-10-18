@@ -2101,10 +2101,10 @@ String get lbHours => "Hours";
   String get next => 'Next';
 
   @override
-  String get workExperience => 'Work Experience';
+  String get workExperience => 'Total Experience';
 
   @override
-  String get availabiltyStatus => 'Availability Status';
+  String get availabiltyStatus => 'Availability for work';
 
   @override
   String get availableDays => 'Available days';
@@ -2119,7 +2119,7 @@ String get lbHours => "Hours";
   String get emergencyContactPersonName => 'Emergency Contact Person Name';
 
   @override
-  String get healthIssueOrNot => 'Health Issue or not';
+  String get healthIssueOrNot => 'Is there any Health Issue or not';
 
   @override
   String get preferredWorkLocation => 'Preferred Work Location';

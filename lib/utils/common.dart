@@ -157,11 +157,11 @@ InputDecoration inputDecoration(
     ),
     focusedErrorBorder: OutlineInputBorder(
       borderRadius: radius(borderRadius ?? defaultRadius),
-      borderSide: BorderSide(color: Colors.red, width: 0.0),
+      borderSide: BorderSide(color: Colors.transparent, width: 0.0),
     ),
     errorBorder: OutlineInputBorder(
       borderRadius: radius(borderRadius ?? defaultRadius),
-      borderSide: BorderSide(color: Colors.red, width: 1.0),
+      borderSide: BorderSide(color: Colors.transparent, width: 1.0),
     ),
     errorMaxLines: 2,
     border: OutlineInputBorder(
@@ -175,7 +175,7 @@ InputDecoration inputDecoration(
     errorStyle: primaryTextStyle(color: Colors.red, size: 10),
     focusedBorder: OutlineInputBorder(
       borderRadius: radius(borderRadius ?? defaultRadius),
-      borderSide: BorderSide(color: primaryColor, width: 0.0),
+      borderSide: BorderSide(color: Colors.transparent, width: 0.0),
     ),
     filled: true,
     fillColor: fillColor ?? context.cardColor,

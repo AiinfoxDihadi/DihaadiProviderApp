@@ -136,12 +136,11 @@ class BasicInfoComponentState extends State<BasicInfoComponent> {
                       if (userData.email.validate().isNotEmpty && widget.flag == 0 && widget.bookingDetail!.canCustomerContact)
                         Row(
                           children: [
-                            ic_message.iconImage(size: 16, color: textSecondaryColorGlobal),
-                            6.width,
-                            Text(userData.email.validate(), style: secondaryTextStyle()).flexible(),
+                            ic_phone.iconImage(size: 16, color: textSecondaryColorGlobal),
+                            12.width,
+                            Text(userData.email.validate().split('@gmail.com').first, style: secondaryTextStyle()).flexible(),
                           ],
                         ).onTap(() {
-                          launchMail(userData.email.validate());
                         }),
                       if (widget.bookingDetail != null && widget.flag == 0 && widget.bookingDetail!.canCustomerContact)
                         Column(
@@ -151,7 +150,7 @@ class BasicInfoComponentState extends State<BasicInfoComponent> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 servicesAddress.iconImage(size: 18, color: textSecondaryColorGlobal),
-                                3.width,
+                                12.width,
                                 Text(widget.bookingDetail!.address.validate(), style: secondaryTextStyle()).flexible(),
                               ],
                             ),

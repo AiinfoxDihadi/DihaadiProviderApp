@@ -5,6 +5,8 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:handyman_provider_flutter/auth/sign_in_screen.dart';
 import 'package:handyman_provider_flutter/auth/sign_in_work_experience.dart';
 import 'package:handyman_provider_flutter/components/app_widgets.dart';
@@ -12,12 +14,14 @@ import 'package:handyman_provider_flutter/components/selected_item_widget.dart';
 import 'package:handyman_provider_flutter/main.dart';
 import 'package:handyman_provider_flutter/models/user_type_response.dart';
 import 'package:handyman_provider_flutter/networks/rest_apis.dart';
+import 'package:handyman_provider_flutter/utils/colors.dart';
 import 'package:handyman_provider_flutter/utils/common.dart';
 import 'package:handyman_provider_flutter/utils/configs.dart';
 import 'package:handyman_provider_flutter/utils/constant.dart';
 import 'package:handyman_provider_flutter/utils/extensions/string_extension.dart';
 import 'package:handyman_provider_flutter/utils/images.dart';
 import 'package:handyman_provider_flutter/utils/model_keys.dart';
+import 'package:handyman_provider_flutter/utils/validators.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:url_launcher/url_launcher.dart' as launch;
 
@@ -40,16 +44,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
   TextEditingController mobileCont = TextEditingController();
   TextEditingController addressCont = TextEditingController();
 
-  /// FocusNodes
-  FocusNode fNameFocus = FocusNode();
-  FocusNode lNameFocus = FocusNode();
-  FocusNode emailFocus = FocusNode();
-  FocusNode userNameFocus = FocusNode();
-  FocusNode mobileFocus = FocusNode();
-  FocusNode userTypeFocus = FocusNode();
-  FocusNode typeFocus = FocusNode();
-  FocusNode passwordFocus = FocusNode();
-  FocusNode designationFocus = FocusNode();
 
   String? selectedUserTypeValue;
 
@@ -62,22 +56,44 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   ValueNotifier _valueNotifier = ValueNotifier(true);
 
+  List<String> gender = ['Male','Female','Others'];
+  String userGender = '';
+
+  String locationMessage = "";
+
+  Future<void> getCurrentLocation() async {
+    LocationPermission permission = await Geolocator.checkPermission();
+
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+    }
+
+    if (permission == LocationPermission.whileInUse || permission == LocationPermission.always) {
+      Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      getAddressFromLatLng(position);
+    } else {
+      toast('permission denied');
+    }
+  }
+
+  Future<void> getAddressFromLatLng(Position position) async {
+    try {
+      List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
+      Placemark place = placemarks[0];
+      setState(() {
+        addressCont.text = "${place.street}, ${place.locality}, ${place.country}";
+      });
+    } catch (e) {
+      print(e);
+      toast('Could not retrieve address');
+    }
+  }
+
   @override
   void dispose() {
     super.dispose();
-
     fNameCont.dispose();
     mobileCont.dispose();
-
-    fNameFocus.dispose();
-    lNameFocus.dispose();
-    emailFocus.dispose();
-    userNameFocus.dispose();
-    mobileFocus.dispose();
-    userTypeFocus.dispose();
-    typeFocus.dispose();
-    passwordFocus.dispose();
-    designationFocus.dispose();
   }
 
   //----------------------------------- UI -----------------------------------//
@@ -154,8 +170,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         AppTextField(
           textFieldType: TextFieldType.NAME,
           controller: fNameCont,
-          focus: fNameFocus,
-          nextFocus: mobileFocus,
+          isValidationRequired: true,
           errorThisFieldRequired: languages.hintRequired,
           decoration: inputDecoration(context, hint: languages.hintFirstNameTxt),
           suffix: profile.iconImage(size: 10).paddingAll(14),
@@ -164,31 +179,81 @@ class _SignUpScreenState extends State<SignUpScreen> {
         AppTextField(
           textFieldType: TextFieldType.PHONE,
           controller: mobileCont,
-          focus: mobileFocus,
-          nextFocus: designationFocus,
-          errorThisFieldRequired: languages.hintRequired,
+          validator: Validator.phoneNumberValidate,
+          isValidationRequired: true,
           decoration: inputDecoration(context, hint: languages.phone),
           suffix: ic_phone.iconImage(size: 10).paddingAll(16),
         ),
         16.height,
-        AppTextField(
-          textFieldType: TextFieldType.USERNAME,
-          controller: genderCont,
-          isValidationRequired: true,
-          focus: designationFocus,
-          nextFocus: passwordFocus,
-          errorThisFieldRequired: languages.hintRequired,
-          decoration: inputDecoration(context, hint: languages.gender),
-          suffix: profile.iconImage(size: 10).paddingAll(14),
+        GestureDetector(
+          onTap: () {
+            showModalBottomSheet(
+              backgroundColor: context.scaffoldBackgroundColor,
+              context: context,
+              useSafeArea: true,
+              isScrollControlled: true,
+              isDismissible: true,
+              builder: (_) {
+                return Container(
+                  width: MediaQuery.of(context).size.width,
+                  padding: EdgeInsets.all(16.0),
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: gender.length,
+                    itemBuilder: (c, i) {
+                      return Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                userGender = gender[i];
+                              });
+                              finish(context);
+                            },
+                            child: Text(
+                              gender[i],
+                              style: boldTextStyle(),
+                            ),
+                          ),
+                          SizedBox(height: 5),
+                        ],
+                      ).paddingOnly(bottom: 20);
+                    },
+                  ),
+                );
+              },
+            );
+          },
+          child: Container(
+            height: 50,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: cardColor,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  maxLines: 2,
+                  userGender.isNotEmpty
+                      ? userGender
+                      : languages.gender,
+                  style: userGender.isNotEmpty ? primaryTextStyle() : secondaryTextStyle(),
+                ).flexible(),
+                Icon(Icons.arrow_drop_down, color: textSecondaryColorGlobal),
+              ],
+            ).paddingOnly(left: 10, right: 10),
+          ),
         ),
         16.height,
         AppTextField(
-          textFieldType: TextFieldType.USERNAME,
+          textFieldType: TextFieldType.PHONE,
           controller: ageCont,
-          isValidationRequired: true,
-          focus: passwordFocus,
-          nextFocus: lNameFocus,
-          errorThisFieldRequired: languages.hintRequired,
+          validator: Validator.age,
           decoration: inputDecoration(context, hint: languages.age),
           suffix: profile.iconImage(size: 10).paddingAll(14),
         ),
@@ -269,12 +334,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
         AppTextField(
           textFieldType: TextFieldType.USERNAME,
           controller: addressCont,
+          validator: Validator.address,
           isValidationRequired: true,
-          focus: lNameFocus,
-          nextFocus: lNameFocus,
           errorThisFieldRequired: languages.hintRequired,
           decoration: inputDecoration(context, hint: languages.address),
-          suffix: ic_location.iconImage(size: 10).paddingAll(14),
+          suffix: GestureDetector(
+            onTap: () {
+              getCurrentLocation();
+            },
+              child: ic_location.iconImage(size: 10).paddingAll(14)),
         ),
         20.height,
         // _buildTcAcceptWidget(),
@@ -288,9 +356,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
           width: context.width() - context.navigationBarHeight,
           onTap: () {
             if(formKey.currentState!.validate()) {
-              appStore.setContactNumber(mobileCont.text.trim());
-              appStore.setFirstName(fNameCont.text.trim());
-              SignInWorkExperience().launch(context);
+              if(userGender.isNotEmpty) {
+                appStore.setContactNumber(mobileCont.text.trim());
+                appStore.setFirstName(fNameCont.text.trim());
+                SignInWorkExperience().launch(context);
+              } else {
+                toast('Please select gender');
+              }
+
             }
 
           },

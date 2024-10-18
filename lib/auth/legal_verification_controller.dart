@@ -40,16 +40,41 @@ class LegalVerificationController extends GetxController {
     update();
   }
 
-  void removeImage() async {
-    if (aadhaarCard != null) {
-      try {
-        await aadhaarCard!.delete();
-        aadhaarCard = null;
-        image = false;
-        update();
-      } catch (e) {
-        print("Error deleting image: $e");
+  void removeImage({String? type}) async {
+    if(type == 'aadhaar'){
+      if (aadhaarCard != null) {
+        try {
+          await aadhaarCard!.delete();
+          aadhaarCard = null;
+          image = false;
+          update();
+        } catch (e) {
+          print("Error deleting image: $e");
+        }
+      }
+    } else if(type == 'local') {
+      if (localAddress != null) {
+        try {
+          await localAddress!.delete();
+          localAddress = null;
+          localImage = false;
+          update();
+        } catch (e) {
+          print("Error deleting image: $e");
+        }
+      }
+    }else  {
+      if (selfie != null) {
+        try {
+          await selfie!.delete();
+          selfie = null;
+          selfieImage = false;
+          update();
+        } catch (e) {
+          print("Error deleting image: $e");
+        }
       }
     }
+
   }
 }

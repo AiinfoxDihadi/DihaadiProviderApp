@@ -4,7 +4,6 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:get/get.dart';
 import 'package:handyman_provider_flutter/auth/finishing_screen.dart';
 import 'package:handyman_provider_flutter/auth/legal_verification_controller.dart';
-import 'package:handyman_provider_flutter/auth/sign_in_screen.dart';
 import 'package:handyman_provider_flutter/components/app_widgets.dart';
 import 'package:handyman_provider_flutter/main.dart';
 import 'package:handyman_provider_flutter/networks/rest_apis.dart';
@@ -14,12 +13,24 @@ import 'package:handyman_provider_flutter/utils/configs.dart';
 import 'package:handyman_provider_flutter/utils/model_keys.dart';
 import 'package:nb_utils/nb_utils.dart';
 
-class LegalVerificationScreen extends StatelessWidget {
+class LegalVerificationScreen extends StatefulWidget {
   const LegalVerificationScreen({super.key});
 
   @override
+  State<LegalVerificationScreen> createState() => _LegalVerificationScreenState();
+}
+
+class _LegalVerificationScreenState extends State<LegalVerificationScreen> {
+  LegalVerificationController lController = Get.put(LegalVerificationController());
+
+  @override
+  void dispose() {
+    Get.delete<LegalVerificationController>();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    LegalVerificationController lController = Get.put(LegalVerificationController());
     return Scaffold(
       appBar: appBarWidget(
         languages.legalVerification,
@@ -49,9 +60,20 @@ class LegalVerificationScreen extends StatelessWidget {
                       decoration: BoxDecoration(
                           color: cardColor,
                           borderRadius: BorderRadius.circular(12)),
-                      child: controller.image ? ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                          child: Image.file(controller.aadhaarCard!,fit: BoxFit.cover)):
+                      child: controller.image ? Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                              child: Image.file(controller.aadhaarCard!,fit: BoxFit.cover)),
+                          Positioned(top: 5,right:10,child: GestureDetector(
+                              behavior: HitTestBehavior.opaque,
+                              onTap: () {
+                                controller.removeImage(type: 'aadhaar');
+                              },
+                              child: Icon(Icons.highlight_remove_sharp,color: Colors.white)))
+                        ],
+                      ):
                       Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -82,7 +104,7 @@ class LegalVerificationScreen extends StatelessWidget {
                           Positioned(top: 5,right:10,child: GestureDetector(
                             behavior: HitTestBehavior.opaque,
                             onTap: () {
-                              controller.removeImage();
+                              controller.removeImage(type: 'local');
                             },
                               child: Icon(Icons.highlight_remove_sharp,color: Colors.white)))
                         ],
@@ -100,7 +122,7 @@ class LegalVerificationScreen extends StatelessWidget {
                   GestureDetector(
                     behavior: HitTestBehavior.opaque,
                     onTap: () {
-                      controller.selfieImage ? null :controller.selfieSnap();
+                      controller.selfieImage ? null : controller.selfieSnap();
                     },
                     child: Container(
                       height: 150,
@@ -108,9 +130,20 @@ class LegalVerificationScreen extends StatelessWidget {
                       decoration: BoxDecoration(
                           color: cardColor,
                           borderRadius: BorderRadius.circular(12)),
-                      child: controller.selfieImage ? ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: Image.file(controller.selfie!,fit: BoxFit.cover)):
+                      child: controller.selfieImage ? Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Image.file(controller.selfie!,fit: BoxFit.cover)),
+                          Positioned(top: 5,right:10,child: GestureDetector(
+                              behavior: HitTestBehavior.opaque,
+                              onTap: () {
+                                controller.removeImage();
+                              },
+                              child: Icon(Icons.highlight_remove_sharp,color: Colors.white)))
+                        ],
+                      ):
                       Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -129,7 +162,11 @@ class LegalVerificationScreen extends StatelessWidget {
                     width: MediaQuery.sizeOf(context).width -
                         context.navigationBarHeight,
                     onTap: () {
-                      saveUser(context);
+                      if(controller.selfie != null && controller.localAddress !=null && controller.aadhaarCard != null) {
+                        saveUser(context);
+                      } else {
+                        toast('Please upload documents');
+                      }
                     },
                   ),
                   30.height
@@ -166,11 +203,17 @@ class LegalVerificationScreen extends StatelessWidget {
           appStore.setLoading(false);
           push(FinishingScreen(), isNewTask: true, pageRouteAnimation: PageRouteAnimation.Fade);
         }).catchError((e) {
-          toast('Something went Wrong', print: true);
+          if(e == 'The email has already been taken.')
+            {
+              toast('The mobile has already been taken');
+            } else {
+            toast('Something went Wrong', print: true);
+          }
+
           appStore.setLoading(false);
         });
       }
-    }
+}
 
   Column buildImageWidget(
       BuildContext context, String name, String image, Function? onTap) {

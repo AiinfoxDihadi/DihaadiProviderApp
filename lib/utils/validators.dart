@@ -31,4 +31,18 @@ class Validator {
     RequiredValidator(errorText: 'Please enter OTP'),
     PatternValidator(r'^\d{4}$', errorText: "Phone number must be 4 digits")
   ]);
+
+  static var age = MultiValidator([
+    RequiredValidator(errorText: 'Please enter Age'),
+    PatternValidator(r'^\d{2}$', errorText: "Enter Correct Age")
+  ]);
+
+  static var totalExperience = MultiValidator([
+    RequiredValidator(errorText: 'Please enter total experience'),
+    PatternValidator(r'^(?:[1-9]|[1-9]\d)$', errorText: "Enter valid experience in years")
+  ]);
+
+  static var address = MultiValidator([
+    RequiredValidator(errorText: 'Please enter Address'),
+  ]);
 }

@@ -25,8 +25,9 @@ class SkillsAddController extends GetxController {
   ];
   List<String> hoursList = ['Full Time','Part Time'];
   List<String> workLocation = ['House','Office','Girls PG' , "Boys PG"];
-
+  List<String> availableDaysList = ['Monday','Tuesday' , "Wednesday",'Thursday','Friday','Saturday'];
   List<String> selectedSkills = <String>[].obs;
+  List<String> availableDays = <String>[].obs;
 
   var hours = ''.obs;
   var work = ''.obs;
@@ -38,6 +39,15 @@ class SkillsAddController extends GetxController {
       selectedSkills.add(skillName);
     }
   }
+
+  void addDays(String days) {
+    if (availableDays.contains(days)) {
+      availableDays.remove(days);
+    } else {
+      availableDays.add(days);
+    }
+  }
+
  void addHours(String val) {
    hours.value = val;
  }
